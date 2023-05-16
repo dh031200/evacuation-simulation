@@ -14,8 +14,9 @@ from evacuation_simulation import Agent, AgentPool, Environment, show, wait, des
 def evacuation_simulation(map_dir, floor):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor)
-    agent_pool = AgentPool(floor=environment.floor, generate_frequency=0.1, adult_kids_ratio=0.7,
-                           check_function=environment.check)
+    agent_pool = AgentPool(
+        floor=environment.floor, generate_frequency=0.1, adult_kids_ratio=0.7, check_function=environment.check
+    )
     for floor in environment.floor:
         agent_pool.generate(floor, environment.get_spawn_point(floor))
 

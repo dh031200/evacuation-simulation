@@ -59,5 +59,4 @@ class AgentPool:
         for agent in self.pool:
             y, x = self.check_function(floor, agent.location)
             if any([y, x]):
-                agent.move(y,x)
-
+                agent.move(y, x)
