@@ -11,7 +11,7 @@ requires-python = ">=3.7"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "U.N. Owen", email = "void@some.where" },
+  { name = "Danny Kim", email = "imbird0312@gmail.com" },
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -26,12 +26,15 @@ classifiers = [
 ]
 dependencies = [
   "click",
+  "pandas",
+  "numpy",
+  "opencv-python",
 ]
 
 [project.urls]
-Documentation = "https://github.com/unknown/evacuation-simulation#readme"
-Issues = "https://github.com/unknown/evacuation-simulation/issues"
-Source = "https://github.com/unknown/evacuation-simulation"
+Documentation = "https://github.com/dh031200/evacuation-simulation#readme"
+Issues = "https://github.com/dh031200/evacuation-simulation/issues"
+Source = "https://github.com/dh031200/evacuation-simulation"
 
 [project.scripts]
 evacuation-simulation = "evacuation_simulation.cli:evacuation_simulation"
@@ -65,9 +68,6 @@ dependencies = [
   "black>=23.1.0",
   "mypy>=1.0.0",
   "ruff>=0.0.243",
-  "pandas",
-  "numpy",
-  "opencv",
 ]
 [tool.hatch.envs.lint.scripts]
 typing = "mypy --install-types --non-interactive {args:src/evacuation_simulation tests}"
