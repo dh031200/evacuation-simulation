@@ -5,7 +5,7 @@ from .agent import Agent, AgentPool
 from .envrionment import Environment
 
 
-def show(name, __map, pool):
+def show(name, __map, pool, writer):
     _map = __map.copy()
     for _agent in pool:
         for row, col in _agent.location:
@@ -18,11 +18,13 @@ def show(name, __map, pool):
 
     v_map = np.full((h, w, 3), (255, 255, 255), dtype=np.uint8)
     # v_map[_map == -1] = (255, 255, 255)
-    v_map[_map == -2] = (0, 0, 255)
     v_map[_map == 0] = (0, 255, 0)
-    v_map[_map == 2] = (255, 0, 0)
-    v_map[_map == 3] = (255, 0, 255)
+    v_map[_map == -2] = (0, 0, 255)
+    v_map[_map == -3] = (255, 0, 0)
+    v_map[_map > 0] = (255, 0, 255)
 
+    # print(v_map.shape)
+    writer.write(v_map)
     cv2.imshow(name, v_map)
     cv2.waitKey(1)
 
@@ -36,5 +38,12 @@ def wait():
 def destroy():
     cv2.destroyAllWindows()
 
+def set_writer():
+    return cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (1594, 1054))
 
-__all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy'
+def release(writer):
+    writer.release()
+
+
+
+__all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy', 'set_writer', 'release'
