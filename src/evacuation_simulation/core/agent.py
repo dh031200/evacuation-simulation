@@ -12,23 +12,8 @@ class Agent:
         self.location = loc
         self.direction = direction  # 0:N,  1:E,  2:S,  3:W
 
-        # if is_adult:
-        #     if direction % 2:
-        #         self.location.append([loc[0][0] + 1, loc[0][1]])
-        #     else:
-        #         self.location.append([loc[0][0], loc[0][1] + 1])
-
     def move(self, r, c):
         self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
-
-
-# class Adult(Agent):
-#     def __init__(self, floor, loc: list[list[int, int]], direction):
-#         super().__init__(floor, loc, direction)
-#         if direction % 2:
-#             self.location.append([loc[0][0] + 1, loc[0][1]])
-#         else:
-#             self.location.append([loc[0][0], loc[0][1] + 1])
 
 
 class AgentPool:
@@ -57,6 +42,6 @@ class AgentPool:
 
     def move(self, floor):
         for agent in self.pool:
-            y, x = self.check_function(floor, agent.location)
-            if any([y, x]):
-                agent.move(y, x)
+            _next = self.check_function(floor, agent.location)
+            if _next:
+                agent.move(*_next)

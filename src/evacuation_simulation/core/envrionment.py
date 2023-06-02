@@ -1,4 +1,4 @@
-from random import sample
+from random import sample, randint
 from pathlib import Path
 
 import pandas as pd
@@ -36,11 +36,13 @@ class Environment:
 
     def check(self, floor, points):
         # direction = [self.dir[i] for i in sample(range(4), 4)]
+        targets = []
         for y, x in self.dir:
-            is_passed = True
             for point in points:
-                if self.map[floor]['map'][point[0] + y, point[1] + x]:
-                    is_passed = False
-            if is_passed:
-                return y, x
-        return False, False
+                if not self.map[floor]['map'][point[0] + y, point[1] + x]:
+                    targets.append((y, x))
+
+        if targets:
+            targets = targets[randint(0, len(targets) - 1)]
+
+        return targets

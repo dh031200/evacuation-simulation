@@ -16,12 +16,12 @@ def show(name, __map, pool):
 
     h, w = _map.shape
 
-    v_map = np.full((h, w, 3), (255, 255, 255), dtype=np.uint8)
+    v_map = np.full((h, w, 3), (0, 0, 0), dtype=np.uint8)
     # v_map[_map == -1] = (255, 255, 255)
-    v_map[_map == -2] = (0, 0, 255)
-    v_map[_map == 0] = (0, 255, 0)
+    v_map[_map == -2] = (0, 255, 0)
+    v_map[_map == 0] = (255, 255, 255)
     v_map[_map == 2] = (255, 0, 0)
-    v_map[_map == 3] = (255, 0, 255)
+    v_map[_map == 3] = (0, 0, 255)
 
     cv2.imshow(name, v_map)
     cv2.waitKey(1)
