@@ -16,10 +16,11 @@ def evacuation_simulation(map_dir, floor, scenario):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario)
     # print(environment.info['entrance'])
-    agent_pool = AgentPool(generate_frequency=1.0, goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.1)
+    agent_pool = AgentPool(generate_frequency=1.0, goal=environment.info['rally_point'], adult_kids_ratio=0.7,
+                           random_move_ratio=0.0)
     _map = environment.info['map'].copy()
     # agent_pool.generate([223,433])
-    # agent_pool.generate([349,314])
+    agent_pool.generate([297, 179])
     # _map = environment.info['map'].copy()
     # for agent in agent_pool.pool:
     #     _next = agent.check(environment.get_area(_map, agent.location, agent.sight))
@@ -28,7 +29,7 @@ def evacuation_simulation(map_dir, floor, scenario):
     # print(f"environment.info['rally_point'] : {environment.info['rally_point']}")
     for i in range(1000):
         # _map = environment.info['map'].copy()
-        agent_pool.generate(environment.get_spawn_point())
+        # agent_pool.generate(environment.get_spawn_point())
         arrived = []
         for _id in agent_pool.pool:
             agent = agent_pool.pool[_id]
@@ -48,7 +49,7 @@ def evacuation_simulation(map_dir, floor, scenario):
                 # print(b_loc[0])
                 # print(b_loc[1])
                 # print(_map[b_loc[0],b_loc[1]])
-                environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0],b_loc[1]]
+                environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0], b_loc[1]]
                 environment.info['map'][a_loc[0], a_loc[1]] = _id
             # print('--------------------------------------------')
             # print(agent.location)
@@ -62,7 +63,7 @@ def evacuation_simulation(map_dir, floor, scenario):
         # agent_pool.process()
 
         show(f'Simulation of {floor}F_S_{scenario}', environment.info['map'], agent_pool.pool)  # , area)
-        # wait()
+        wait()
     destroy()
 
 # direction = (

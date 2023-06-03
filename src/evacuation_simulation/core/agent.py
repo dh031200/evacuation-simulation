@@ -72,6 +72,7 @@ class Agent:
     #     return [i for i in self.location]
 
     def check(self, area):
+        area[area == self._id] = 0
         self.area = area
         # print(area)
         # if -3 in area:
@@ -79,8 +80,8 @@ class Agent:
         directions = []
         # print('-----------------------------')
         # print(self.location)
-        # print('sight:')
-        # print(area)
+        print('sight:')
+        print(area)
         for i, (dy, dx) in enumerate(direction):
             # print(f'enume direction : {direction}')
             # print(f'(dy, dx) : {(dy, dx)}')
@@ -92,6 +93,8 @@ class Agent:
             # print(f'max_x : {max_x}')
             # print(f'min_y : {min_y}')
             # print(f'max_y : {max_y}')
+
+
             if len(self.location) > 1:
                 if i == 0:
                     max_x += 1
@@ -107,6 +110,37 @@ class Agent:
                         max_y += 1
                 else:
                     max_y += 1
+
+
+            # if len(self.location) > 1:
+            #     zy = self.location[0][0] - self.location[1][0]
+            #     zx = self.location[0][1] - self.location[1][1]
+            #     print(f'zy, zx : {zy}, {zx}')
+            #     # print(zy, zx)
+            #     if i % 2:
+            #         max_y += 1
+            #         min_x += zx
+            #         max_x += zx
+            #     else:
+            #         max_x += 1
+            #         min_y += zy
+            #         max_y += zy
+
+                # if i == 0:
+                #     max_x += 1
+                # elif i == 1:
+                #     max_y += 1
+                #     if not self.direction % 2:
+                #         min_x += 1
+                #         max_x += 1
+                # elif i == 2:
+                #     max_x += 1
+                #     if self.direction % 2:
+                #         min_y += 1
+                #         max_y += 1
+                # else:
+                #     max_y += 1
+
             #     print('adult:')
             #     print(f'min_x : {min_x}')
             #     print(f'max_x : {max_x}')
@@ -131,7 +165,7 @@ class Agent:
             elif not area[min_y:max_y, min_x:max_x].any():
                 directions.append(i)
         # print('--------------------------')
-        # print(f'directions : {[direction_name[j] for j in directions]}')
+        print(f'directions : {[direction_name[j] for j in directions]}')
         return directions
 
     def move(self, directions):
@@ -147,6 +181,7 @@ class Agent:
                 # print(f't : {t}')
                 # print(f'directions : {directions}')
                 sorted_directions = sorted(directions, key=lambda x: dists[directions.index(x)])
+                print(f'sorted_directions : {sorted_directions}')
                 # print(f'sorted_directions : {sorted_directions}')
                 # print(f'sorted_directions : {sorted_directions}')
                 _y, _x = self.location[0]
@@ -160,6 +195,8 @@ class Agent:
                     r, c = direction[_next[0]]
                 else:
                     r, c = direction[np.random.choice(directions)]
+
+                print(f'r, c : {r}, {c}')
                     # r, c = 0, 0
 
                 # best = np.argmin(cdist(t, goal))
@@ -180,6 +217,7 @@ class Agent:
             #     r, c = direction[np.random.choice(directions)]
             # print(f'r, c : {r}, {c}')
             self.direction = direction_dict[(r, c)]
+            print(f'go {direction_name[self.direction]}')
             # print(f'direction : {self.direction}')
             self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
             self.visited.add(tuple(self.location[0]))
@@ -195,9 +233,15 @@ class Adult(Agent):
         super().move(directions)
         _loc = [self.location[0]]
         if self.direction % 2:
-            _loc.append([self.location[0][0] + 1, self.location[0][1]])
+            if not self.area[self.sight + 1, self.sight]:
+                _loc.append([self.location[0][0] + 1, self.location[0][1]])
+            elif not self.area[self.sight - 1, self.sight]:
+                _loc.append([self.location[0][0] - 1, self.location[0][1]])
         else:
-            _loc.append([self.location[0][0], self.location[0][1] + 1])
+            if not self.area[self.sight, self.sight + 1]:
+                _loc.append([self.location[0][0], self.location[0][1] + 1])
+            elif not self.area[self.sight, self.sight - 1]:
+                _loc.append([self.location[0][0], self.location[0][1] - 1])
         self.location = _loc
         # return self.location
 
