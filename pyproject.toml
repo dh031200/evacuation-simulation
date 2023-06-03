@@ -29,6 +29,7 @@ dependencies = [
   "pandas",
   "numpy",
   "opencv-python",
+  "scipy",
 ]
 
 [project.urls]
