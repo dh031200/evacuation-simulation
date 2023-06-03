@@ -8,8 +8,19 @@ from .envrionment import Environment
 def show(name, __map, pool):  # , area):
     _map = __map.copy()
     if pool:
-        _locs = np.array([sum(_agent.location, []) for _agent in pool])
-        _map[_locs[:, 0], _locs[:, 1]] = 3
+        _locs = []
+        for _id in pool:
+            # print(f'{_agent._id} : {_agent.location}')
+            # print(f'area : {_agent.area}')
+            _locs += pool[_id].location
+        locs = np.array(_locs)
+        _map[locs[:, 0], locs[:, 1]] = 3
+        # print(f'_locs : {_locs}')
+        # print(__locs)
+        # print([_agent.location for _agent in pool])
+        # _locs = np.array([sum(_agent.location, []) for _agent in pool])
+        # print(f'_locs : {_locs}')
+        # _map[_locs[:, 0], _locs[:, 1]] = 3
 
     _map = np.repeat(_map, repeats=2, axis=1)
     _map = np.repeat(_map, repeats=2, axis=0)
@@ -18,8 +29,9 @@ def show(name, __map, pool):  # , area):
 
     v_map = np.full((h, w, 3), (0, 0, 0), dtype=np.uint8)
     v_map[_map == -2] = (0, 255, 0)
+    v_map[_map == -3] = (255, 0, 0)
     v_map[_map == 0] = (255, 255, 255)
-    v_map[_map == 2] = (255, 0, 0)
+    # v_map[_map == 2] = (255, 0, 0)
     v_map[_map == 3] = (0, 0, 255)
 
     cv2.imshow(name, v_map)

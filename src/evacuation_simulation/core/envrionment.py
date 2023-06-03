@@ -32,9 +32,15 @@ class Environment:
     def get_spawn_point(self):
         return self.info['entrance'][randint(0, self.n_entrance - 1)]
 
-    def get_area(self, loc, sight):
-        y, x = loc[0]
-        return self.info['map'][y - sight:y + sight + 1, x - sight:x + sight + 1]
+    @staticmethod
+    def get_area(_map, loc, sight):
+        min_y, max_y, min_x, max_x = int(1e9), -int(1e9), int(1e9), -int(1e9),
+        for _loc in loc:
+            min_y = min(min_y, _loc[0])
+            max_y = max(max_y, _loc[0])
+            min_x = min(min_x, _loc[1])
+            max_x = max(max_x, _loc[1])
+        return _map[min_y - sight:max_y + sight + 1, min_x - sight:max_x + sight + 1]
 
     # def check(self, floor, points):
     #     # direction = [self.dir[i] for i in sample(range(4), 4)]
