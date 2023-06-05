@@ -17,7 +17,21 @@ class Environment:
         self.info = None
         self.floor = floor
         self.n_entrance = None
+        self.movable = None
         self.read_map(Path(_map) / f'{floor}f_grid_S_{scenario}.csv')
+
+    @property
+    def width(self):
+        return self.info['map'].shape[1]
+
+    @property
+    def height(self):
+        return self.info['map'].shape[0]
+
+    def calc_occupancy(self):
+        return round(len(self.info['map'][self.info['map'] > 0]) + len(self.info['map'][self.info['map'] == -3])*100,3)
+        # print(len(self.info['map'][self.info['map'] > 0]))
+        # print(self.info['map'][self.info['map'] > 0].shape)
 
     def read_map(self, csv):
         _map = pd.read_csv(csv, index_col=0).to_numpy()
@@ -25,6 +39,7 @@ class Environment:
         # pd.DataFrame(_map).to_csv('2f_grid.csv')
         rally_point = np.argwhere(_map == -3)
         entrance = np.argwhere(_map == -2)
+        self.movable = len(np.where(_map == 0)[0])
 
         self.info = dict(map=_map, rally_point=rally_point, entrance=entrance)
         self.n_entrance = len(self.info['entrance'])

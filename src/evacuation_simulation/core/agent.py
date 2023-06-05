@@ -80,8 +80,8 @@ class Agent:
         directions = []
         # print('-----------------------------')
         # print(self.location)
-        print('sight:')
-        print(area)
+        # print('sight:')
+        # print(area)
         for i, (dy, dx) in enumerate(direction):
             # print(f'enume direction : {direction}')
             # print(f'(dy, dx) : {(dy, dx)}')
@@ -165,38 +165,33 @@ class Agent:
             elif not area[min_y:max_y, min_x:max_x].any():
                 directions.append(i)
         # print('--------------------------')
-        print(f'directions : {[direction_name[j] for j in directions]}')
+        # print(f'directions : {[direction_name[j] for j in directions]}')
         return directions
 
     def move(self, directions):
-        # print(f'self.visited : {self.visited}')
         if len(directions):
-            if random() < self.random_move:
+            if not self.area.any() and random() < self.random_move:
                 r, c = direction[np.random.choice(directions)]
             else:
                 t = [(self.y + direction[d][0], self.x + direction[d][1]) for d in directions]
                 dists = cdist(t, self.goal)
 
-                # print(f'dists : {dists}')
-                # print(f't : {t}')
-                # print(f'directions : {directions}')
                 sorted_directions = sorted(directions, key=lambda x: dists[directions.index(x)])
-                print(f'sorted_directions : {sorted_directions}')
                 # print(f'sorted_directions : {sorted_directions}')
-                # print(f'sorted_directions : {sorted_directions}')
+
                 _y, _x = self.location[0]
                 _next = []
                 for d in sorted_directions:
                     r, c = direction[d]
                     if (_y + r, _x + c) not in self.visited:
                         _next.append(d)
-                # print(f'_next : {_next}')
+
                 if _next:
                     r, c = direction[_next[0]]
                 else:
                     r, c = direction[np.random.choice(directions)]
 
-                print(f'r, c : {r}, {c}')
+                # print(f'r, c : {r}, {c}')
                     # r, c = 0, 0
 
                 # best = np.argmin(cdist(t, goal))
@@ -217,7 +212,7 @@ class Agent:
             #     r, c = direction[np.random.choice(directions)]
             # print(f'r, c : {r}, {c}')
             self.direction = direction_dict[(r, c)]
-            print(f'go {direction_name[self.direction]}')
+            # print(f'go {direction_name[self.direction]}')
             # print(f'direction : {self.direction}')
             self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
             self.visited.add(tuple(self.location[0]))
@@ -257,10 +252,8 @@ class AgentPool:
         self.random_move_ratio = random_move_ratio
         # self.check_function = check_function
 
-    # def get_id(self):
-    #     _id = self._id
-    #     # self._id += 1
-    #     return _id
+    def get_id(self):
+        return self._id
 
     def generate(self, point):
         if random() < self.generate_frequency:

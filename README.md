@@ -24,7 +24,7 @@ pip install evacuation-simulation
 
 1. In order to calculate the space occupancy rate, the ratio of the total number of spaces (0) that can be moved every
    30 seconds (150 frames) is obtained, and the graph representation and the result value are derived in the form of a
-   result. (accuracy_rate.jpg, accruity_rate.csv)   
+   result. (occupancy_rate.jpg, occupancy_rate.csv)   
    1.1 공간 점유율을 계산하기 위해 30초(150frame)마다 전체 이동할 수 있는 공간 수(0)중에서 실제 공간이 점유 된 공간(2)의 비율을 구하고 그래프 표현, 결과값을 형태로 도출한다.(
    occupancy_rate.jpg, occupancy_rate.csv )
 

@@ -30,6 +30,7 @@ dependencies = [
   "numpy",
   "opencv-python",
   "scipy",
+  "matplotlib",
 ]
 
 [project.urls]

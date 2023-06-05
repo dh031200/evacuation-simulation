@@ -4,7 +4,7 @@
 import click
 
 from evacuation_simulation.__about__ import __version__
-from evacuation_simulation import Agent, AgentPool, Environment, show, wait, destroy
+from evacuation_simulation import Agent, AgentPool, Environment, show, wait, destroy, writer, plot, to_csv
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
@@ -16,20 +16,24 @@ def evacuation_simulation(map_dir, floor, scenario):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario)
     # print(environment.info['entrance'])
-    agent_pool = AgentPool(generate_frequency=1.0, goal=environment.info['rally_point'], adult_kids_ratio=0.7,
-                           random_move_ratio=0.0)
+    agent_pool = AgentPool(generate_frequency=0.7, goal=environment.info['rally_point'], adult_kids_ratio=0.7,
+                           random_move_ratio=0.1)
     _map = environment.info['map'].copy()
+    video_writer = writer(environment.height, environment.width)
+    occupancy_rate = []
+    verbose = []
+    num_agents = []
     # agent_pool.generate([223,433])
-    agent_pool.generate([297, 179])
+    # agent_pool.generate([297, 179])
     # _map = environment.info['map'].copy()
     # for agent in agent_pool.pool:
     #     _next = agent.check(environment.get_area(_map, agent.location, agent.sight))
     # show(f'Simulation of {floor}F_S_{scenario}', environment.info['map'], agent_pool.pool)  # , area)
     # wait()
     # print(f"environment.info['rally_point'] : {environment.info['rally_point']}")
-    for i in range(1000):
+    for i in range(10000):
         # _map = environment.info['map'].copy()
-        # agent_pool.generate(environment.get_spawn_point())
+        agent_pool.generate(environment.get_spawn_point())
         arrived = []
         for _id in agent_pool.pool:
             agent = agent_pool.pool[_id]
@@ -45,26 +49,24 @@ def evacuation_simulation(map_dir, floor, scenario):
             before = agent.location
             agent.move(_next)
             for b_loc, a_loc in zip(before, agent.location):
-                # print(f'{b_loc} -> {a_loc}')
-                # print(b_loc[0])
-                # print(b_loc[1])
-                # print(_map[b_loc[0],b_loc[1]])
                 environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0], b_loc[1]]
                 environment.info['map'][a_loc[0], a_loc[1]] = _id
-            # print('--------------------------------------------')
-            # print(agent.location)
-            # print(agent.location)
-            # for _loc in agent.location:
-            #     print(_loc)
-            #     _map[_loc[0], _loc[1]] = _id
-            # for _loc in agent.location
-            #     if _loc
-        agent_pool.check_arrived(arrived)
-        # agent_pool.process()
 
-        show(f'Simulation of {floor}F_S_{scenario}', environment.info['map'], agent_pool.pool)  # , area)
-        wait()
+
+        agent_pool.check_arrived(arrived)
+
+        if not i % 150:
+            num_agents.append(agent_pool.get_id())
+            occupancy_rate.append(environment.calc_occupancy() / environment.movable)
+            verbose.append(i)
+
+            plot(num_agents, occupancy_rate, verbose)
+            to_csv(num_agents, occupancy_rate, verbose)
+
+        show(f'Simulation of {floor}F_S_{scenario}', environment.info['map'], agent_pool.pool, video_writer)  # , area)
+        # wait()
     destroy()
+    video_writer.release()
 
 # direction = (
 #     (-1, 0),  # up

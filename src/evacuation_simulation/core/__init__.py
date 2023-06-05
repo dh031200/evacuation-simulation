@@ -1,11 +1,17 @@
 import cv2
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from .agent import Agent, AgentPool
 from .envrionment import Environment
 
 
-def show(name, __map, pool):  # , area):
+def writer(h, w):
+    return cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (w * 2, h * 2))
+
+
+def show(name, __map, pool, _writer):  # , area):
     _map = __map.copy()
     if pool:
         _locs = []
@@ -34,6 +40,8 @@ def show(name, __map, pool):  # , area):
     # v_map[_map == 2] = (255, 0, 0)
     v_map[_map == 3] = (0, 0, 255)
 
+    _writer.write(v_map)
+
     cv2.imshow(name, v_map)
     cv2.waitKey(1)
 
@@ -48,4 +56,42 @@ def destroy():
     cv2.destroyAllWindows()
 
 
-__all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy'
+def plot(num_agents, occupancy_rate, verbose):
+    plt.title('Occupancy Rate')
+
+    fig, ax1 = plt.subplots()
+    ln1 = ax1.plot(verbose, num_agents, color='red', label='Number of Agents')
+    ax1.set_ylabel('Number of Agents', color='red', rotation=90)
+    ax1.tick_params('y', colors='red')
+    ax1.set_xlabel("Frame")
+
+    # ax2는 y2에 대한 그래프, twinx로 x축을 공유
+    ax2 = ax1.twinx()
+    ln2 = ax2.plot(verbose, occupancy_rate, color='green', label='Occupancy Rate')
+    ax2.set_ylabel('Occupancy Rate', color='green', rotation=90)
+    ax2.tick_params('y', colors='green')
+    lns = ln1 + ln2
+    labs = ['Number of Agents', 'Occupancy Rate (%)']
+    # labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs, loc=0)
+
+    # plt.plot(verbose, num_agents, color='red', label='Number of Agents')
+    # plt.plot(verbose, occupancy_rate, color='blue', label='Occupancy Rate')
+    # plt.xlabel('Frame')
+    # plt.ylabel('Occupancy')
+    # plt.legend()
+    plt.tight_layout()
+    plt.savefig('occupancy_rate.jpg')
+    plt.close()
+
+
+def to_csv(num_agents, occupancy_rate, verbose):
+    print(num_agents)
+    print(occupancy_rate)
+    print(verbose)
+    df = pd.DataFrame([num_agents, occupancy_rate], columns=['num_agents', 'occupancy_rate'], index=verbose)
+    print(df)
+    df.to_csv('occupancy_rate.csv')
+
+
+__all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy', 'writer', 'plot', 'to_csv'
