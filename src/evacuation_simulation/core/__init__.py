@@ -17,6 +17,7 @@ def mkdir(path):
 
 
 def writer(name, h, w, _heatmap=False):
+    _heatmap = not _heatmap
     return cv2.VideoWriter(f'{name}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (w * (1 + _heatmap), h * (1 + _heatmap)))
 
 
