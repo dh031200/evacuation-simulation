@@ -29,7 +29,7 @@ class Environment:
         return self.info['map'].shape[0]
 
     def calc_occupancy(self):
-        return round(len(self.info['map'][self.info['map'] > 0]) + len(self.info['map'][self.info['map'] == -3])*100,3)
+        return len(self.info['map'][self.info['map'] > 0]) + len(self.info['map'][self.info['map'] == -3])
         # print(len(self.info['map'][self.info['map'] > 0]))
         # print(self.info['map'][self.info['map'] > 0].shape)
 
@@ -39,7 +39,7 @@ class Environment:
         # pd.DataFrame(_map).to_csv('2f_grid.csv')
         rally_point = np.argwhere(_map == -3)
         entrance = np.argwhere(_map == -2)
-        self.movable = len(np.where(_map == 0)[0])
+        self.movable = len(np.where(_map == 0)[0]) + len(np.where(_map == -3)[0])
 
         self.info = dict(map=_map, rally_point=rally_point, entrance=entrance)
         self.n_entrance = len(self.info['entrance'])

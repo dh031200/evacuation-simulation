@@ -252,6 +252,9 @@ class AgentPool:
         self.random_move_ratio = random_move_ratio
         # self.check_function = check_function
 
+    def __len__(self):
+        return len(self.pool)
+
     def get_id(self):
         return self._id
 
