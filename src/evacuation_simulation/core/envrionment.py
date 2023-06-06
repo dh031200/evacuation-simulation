@@ -1,4 +1,7 @@
-from random import sample, randint
+# SPDX-FileCopyrightText: 2023-present Danny Kim <imbird0312@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+from random import randint
 from pathlib import Path
 
 import pandas as pd
@@ -30,13 +33,9 @@ class Environment:
 
     def calc_occupancy(self):
         return len(self.info['map'][self.info['map'] > 0]) + len(self.info['map'][self.info['map'] == -3])
-        # print(len(self.info['map'][self.info['map'] > 0]))
-        # print(self.info['map'][self.info['map'] > 0].shape)
 
     def read_map(self, csv):
         _map = pd.read_csv(csv, index_col=0).to_numpy()
-        # _map = _map[35:35 + 354, 157:157 + 439]
-        # pd.DataFrame(_map).to_csv('2f_grid.csv')
         rally_point = np.argwhere(_map == -3)
         entrance = np.argwhere(_map == -2)
         self.movable = len(np.where(_map == 0)[0]) + len(np.where(_map == -3)[0])
@@ -56,16 +55,3 @@ class Environment:
             min_x = min(min_x, _loc[1])
             max_x = max(max_x, _loc[1])
         return _map[min_y - sight:max_y + sight + 1, min_x - sight:max_x + sight + 1]
-
-    # def check(self, floor, points):
-    #     # direction = [self.dir[i] for i in sample(range(4), 4)]
-    #     targets = []
-    #     for y, x in self.dir:
-    #         for point in points:
-    #             if not self.map[floor]['map'][point[0] + y, point[1] + x]:
-    #                 targets.append((y, x))
-    #
-    #     if targets:
-    #         targets = targets[randint(0, len(targets) - 1)]
-    #
-    #     return targets
