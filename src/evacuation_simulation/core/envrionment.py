@@ -59,4 +59,4 @@ class Environment:
             max_y = max(max_y, _loc[0])
             min_x = min(min_x, _loc[1])
             max_x = max(max_x, _loc[1])
-        return _map[min_y - sight : max_y + sight + 1, min_x - sight : max_x + sight + 1]
+        return _map[min_y - sight: max_y + sight + 1, min_x - sight: max_x + sight + 1]

@@ -4,8 +4,7 @@
 import click
 
 from evacuation_simulation.__about__ import __version__
-from evacuation_simulation import Agent, AgentPool, Environment, show, wait, destroy, writer, plot, to_csv, counts
-
+from evacuation_simulation import AgentPool, Environment, show, destroy, writer, plot, to_csv
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
 @click.version_option(version=__version__, prog_name="Evacuation-Simulation")
@@ -57,6 +56,5 @@ def evacuation_simulation(map_dir, floor, scenario):
             plot(num_activate_agents, num_total_agents, occupancy_rate, verbose)
             to_csv(num_activate_agents, num_total_agents, occupancy_rate, verbose)
 
-        # wait()
     destroy()
     video_writer.release()
