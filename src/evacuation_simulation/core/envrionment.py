@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2023-present Danny Kim <imbird0312@gmail.com>
 #
 # SPDX-License-Identifier: MIT
-from random import randint
+from random import choice, random
 from pathlib import Path
 
 import pandas as pd
@@ -14,13 +14,22 @@ import numpy as np
 -3 집결지
 """
 
+direction = (
+    (-1, 0),  # up
+    (0, 1),  # right
+    (1, 0),  # down
+    (0, -1),  # left
+)
+
 
 class Environment:
-    def __init__(self, _map, floor, scenario):
+    def __init__(self, _map, floor, scenario, generate_frequency):
         self.info = None
         self.floor = floor
         self.n_entrance = None
         self.movable = None
+        self.frequency_map = None
+        self.generate_frequency = generate_frequency
         self.read_map(Path(_map) / f'{floor}f_grid_S_{scenario}.csv')
 
     @property
@@ -36,6 +45,7 @@ class Environment:
 
     def read_map(self, csv):
         _map = pd.read_csv(csv, index_col=0).to_numpy()
+        self.frequency_map = np.zeros(_map.shape)
         rally_point = np.argwhere(_map == -3)
         entrance = np.argwhere(_map == -2)
         self.movable = len(np.where(_map == 0)[0]) + len(np.where(_map == -3)[0])
@@ -44,7 +54,18 @@ class Environment:
         self.n_entrance = len(self.info['entrance'])
 
     def get_spawn_point(self):
-        return self.info['entrance'][randint(0, self.n_entrance - 1)]
+        spawn_points = []
+        ret = True
+        for i in self.info['entrance']:
+            spawn_point = []
+            for d in direction:
+                if not self.info['map'][i[0] + d[0], i[1] + d[1]]:
+                    spawn_point.append((i[0] + d[0], i[1] + d[1]))
+            if spawn_point:
+                spawn_points.append(choice(spawn_point))
+        if spawn_points:
+            ret = False
+        return ret, [i for i in spawn_points if random() < self.generate_frequency]
 
     @staticmethod
     def get_area(_map, loc, sight):

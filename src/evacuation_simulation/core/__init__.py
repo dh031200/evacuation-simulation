@@ -1,20 +1,41 @@
 # SPDX-FileCopyrightText: 2023-present Danny Kim <imbird0312@gmail.com>
 #
 # SPDX-License-Identifier: MIT
+import os
+
 import cv2
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from .agent import Agent, AgentPool
+from .agent import AgentPool
 from .envrionment import Environment
 
 
-def writer(h, w):
-    return cv2.VideoWriter('output.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (w * 2, h * 2))
+def mkdir(path):
+    os.makedirs(path, exist_ok=True)
 
 
-def show(name, __map, pool, _writer):
+def writer(name, h, w, _heatmap=False):
+    _heatmap = not _heatmap
+    return cv2.VideoWriter(f'{name}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 30, (w * (1 + _heatmap), h * (1 + _heatmap)))
+
+
+def heatmap(__map):
+    _map = __map.copy()
+    x_min = _map.min()
+    x_max = _map.max()
+
+    _map -= x_min
+    _map /= x_max - x_min
+    _map *= 255
+
+    dst = cv2.applyColorMap(_map.astype(np.uint8), cv2.COLORMAP_JET)
+    cv2.imshow('heatmap', dst)
+    return dst
+
+
+def show(name, __map, pool, num_total_agent, _writer):
     _map = __map.copy()
 
     if pool:
@@ -35,6 +56,8 @@ def show(name, __map, pool, _writer):
     v_map[_map == 0] = (255, 255, 255)
     v_map[_map == 3] = (0, 0, 255)
 
+    cv2.putText(v_map, f'Agents: {num_total_agent}', (5, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255))
+
     _writer.write(v_map)
 
     cv2.imshow(name, v_map)
@@ -51,36 +74,37 @@ def destroy():
     cv2.destroyAllWindows()
 
 
-def plot(num_activate_agents, num_total_agents, occupancy_rate, verbose):
-    plt.title('Occupancy Rate')
+def plot(name, num_activate_agents, num_total_agents, occupancy_rate, verbose):
+    # plt.title('Occupancy Rate')
 
     fig, ax1 = plt.subplots()
     ln1 = ax1.plot(verbose, num_activate_agents, color='red', label='Number of Activate Agents')
-    ln2 = ax1.plot(verbose, num_total_agents, color='blue', label='Number of Total Agents')
+    # ln2 = ax1.plot(verbose, num_total_agents, color='blue', label='Number of Total Agents')
     ax1.set_ylabel('Number of Agents', color='purple', rotation=90)
-    ax1.tick_params('y', colors='purple')
+    ax1.tick_params('y', colors='red')
     ax1.set_xlabel("Frame")
 
     ax2 = ax1.twinx()
-    ln3 = ax2.plot(verbose, occupancy_rate, color='green', label='Occupancy Rate')
+    ln2 = ax2.plot(verbose, occupancy_rate, color='green', label='Occupancy Rate')
     ax2.set_ylabel('Occupancy Rate (%)', color='green', rotation=90)
     ax2.tick_params('y', colors='green')
     ax2.set_ylim([-5, 100])
-    lns = ln1 + ln2 + ln3
-    labs = ['Number of Activate Agents', 'Number of Total Agents', 'Occupancy Rate (%)']
-    ax1.legend(lns, labs, loc=0)
+    lns = ln1 + ln2
+    labs = ['Number of Activate Agents', 'Occupancy Rate (%)']
+    ax1.legend(lns, labs, loc='lower left', bbox_to_anchor=(0.0, 0.0))
 
+    plt.title(f'Simulation   [Total Agent : {num_total_agents[-1]}]')
     plt.tight_layout()
-    plt.savefig('occupancy_rate.jpg')
+    plt.savefig(f'{name}.jpg')
     plt.close()
 
 
-def to_csv(num_activate_agents, num_total_agents, occupancy_rate, verbose):
+def to_csv(name, num_activate_agents, num_total_agents, occupancy_rate, verbose):
     dt = np.array([num_activate_agents, num_total_agents, occupancy_rate]).transpose()
     df = pd.DataFrame(dt, columns=['num_activate_agents', 'num_total_agents', 'occupancy_rate (%)'], index=verbose)
     df['num_activate_agents'] = df['num_activate_agents'].astype(int)
     df['num_total_agents'] = df['num_total_agents'].astype(int)
-    df.to_csv('occupancy_rate.csv')
+    df.to_csv(f'{name}.csv')
 
 
 def counts(_map):
@@ -88,4 +112,4 @@ def counts(_map):
     return {tuple(i): v for i, v in zip(unique, _counts)}
 
 
-__all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy', 'writer', 'plot', 'to_csv', 'counts'
+__all__ = 'AgentPool', 'Environment', 'show', 'destroy', 'writer', 'plot', 'to_csv', 'heatmap', 'prefix'
