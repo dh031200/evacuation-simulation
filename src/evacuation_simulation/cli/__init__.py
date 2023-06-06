@@ -15,8 +15,9 @@ from evacuation_simulation import Agent, AgentPool, Environment, show, wait, des
 def evacuation_simulation(map_dir, floor, scenario):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario)
-    agent_pool = AgentPool(generate_frequency=0.7, goal=environment.info['rally_point'], adult_kids_ratio=0.7,
-                           random_move_ratio=0.1)
+    agent_pool = AgentPool(
+        generate_frequency=0.7, goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.1
+    )
     _map = environment.info['map'].copy()
     video_writer = writer(environment.height, environment.width)
     occupancy_rate = []
@@ -49,7 +50,7 @@ def evacuation_simulation(map_dir, floor, scenario):
 
         if not i % 150:
             num_activate_agents.append(len(agent_pool))
-            num_total_agents.append(agent_pool.get_id()-1)
+            num_total_agents.append(agent_pool.get_id() - 1)
             occupancy_rate.append(round(environment.calc_occupancy() / environment.movable * 100, 4))
             verbose.append(i)
 

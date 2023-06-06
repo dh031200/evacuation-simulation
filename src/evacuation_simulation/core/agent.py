@@ -21,10 +21,7 @@ direction_dict = {
     (0, -1): 3,  # left
 }
 
-direction_name = {0: 'up',
-                  1: 'right',
-                  2: 'down',
-                  3: 'left'}
+direction_name = {0: 'up', 1: 'right', 2: 'down', 3: 'left'}
 
 
 class Agent:
@@ -158,11 +155,21 @@ class AgentPool:
         if random() < self.generate_frequency:
             goal = [self.goal[np.argmin(cdist([point], self.goal))]]
             if random() < self.adult_kids_ratio:
-                self.pool[self._id] = Adult(_id=self._id, loc=point, goal=goal, _direction=randint(0, 3),
-                                            random_move_ratio=self.random_move_ratio)
+                self.pool[self._id] = Adult(
+                    _id=self._id,
+                    loc=point,
+                    goal=goal,
+                    _direction=randint(0, 3),
+                    random_move_ratio=self.random_move_ratio,
+                )
             else:
-                self.pool[self._id] = Agent(_id=self._id, loc=point, goal=goal, _direction=randint(0, 3),
-                                            random_move_ratio=self.random_move_ratio)
+                self.pool[self._id] = Agent(
+                    _id=self._id,
+                    loc=point,
+                    goal=goal,
+                    _direction=randint(0, 3),
+                    random_move_ratio=self.random_move_ratio,
+                )
             self._id += 1
 
     def check_arrived(self, arrived):

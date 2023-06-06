@@ -85,7 +85,7 @@ def to_csv(num_activate_agents, num_total_agents, occupancy_rate, verbose):
 
 def counts(_map):
     unique, _counts = np.unique(_map.reshape(-1, 3), axis=0, return_counts=True)
-    return {tuple(i):v for i, v in zip(unique, _counts)}
+    return {tuple(i): v for i, v in zip(unique, _counts)}
 
 
 __all__ = 'Agent', 'AgentPool', 'Environment', 'show', 'wait', 'destroy', 'writer', 'plot', 'to_csv', 'counts'
