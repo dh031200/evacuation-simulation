@@ -41,7 +41,7 @@ class Agent:
         self.random_move = random_move_ratio
         self.area = None
         self.is_arrive = False
-        self.not_moved = [False] * 10
+        self.not_moved = [False] * 30
         self.history = defaultdict(int)
         # self.history = np.full((30, 2), (-1, -1), dtype=int)
         # self.history = []
@@ -118,17 +118,17 @@ class Agent:
             self.direction = direction_dict[(r, c)]
             self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
             self.visited.add(tuple(self.location[0]))
-            self.not_moved[self.i % 10] = False
+            self.not_moved[self.i % 30] = False
         else:
-            self.not_moved[self.i % 10] = True
+            self.not_moved[self.i % 30] = True
         # self.history.append(self.location[0])
         # self.history[self.i % 30] = self.location[0]
         self.history[tuple(self.location[0])] += 1
         return self.location
 
-    def stuck_check(self):
-        self.history[tuple(self.location[0])]
-        return self.history[tuple(self.location[0])] > 200
+    def stuck_check(self, area):
+        # self.history[tuple(self.location[0])]
+        return (self.history[tuple(self.location[0])] > 100) and (len(np.where(area == -3)[0]) > 2)
         # x, c = np.unique(self.history, return_counts=True, axis=1)
         # if max(c) > 10:
         #     print(f'X: {x}')

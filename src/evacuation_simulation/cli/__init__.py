@@ -15,7 +15,7 @@ from evacuation_simulation import AgentPool, Environment, show, destroy, writer,
 def evacuation_simulation(map_dir, floor, scenario):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario, generate_frequency=0.01)
-    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.1)
+    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.2)
     _map = environment.info['map'].copy()
     simulation_name = f'{floor}F_S_{scenario}'
     prefix = f'{simulation_name}/'
@@ -42,7 +42,8 @@ def evacuation_simulation(map_dir, floor, scenario):
         arrived = []
         for _id in agent_pool.pool:
             agent = agent_pool.pool[_id]
-            _next = agent.check(environment.get_area(environment.info['map'], agent.location, agent.sight))
+            area = environment.get_area(environment.info['map'], agent.location, agent.sight)
+            _next = agent.check(area)
             if agent.is_arrive:
                 for _loc in agent.location:
                     environment.info['map'][_loc[0], _loc[1]] = -3
@@ -52,7 +53,7 @@ def evacuation_simulation(map_dir, floor, scenario):
             before = agent.location
             # agent.move(_next)
             coords = agent.move(_next)
-            if sum(agent.not_moved) == 10 or agent.stuck_check():
+            if sum(agent.not_moved) == 30 or agent.stuck_check(area):
                 for _loc in agent.location:
                     environment.info['map'][_loc[0], _loc[1]] = -3
                 arrived.append(agent.id)
