@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from random import random, randint
 from scipy.spatial.distance import cdist
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import numpy as np
 
@@ -41,6 +41,11 @@ class Agent:
         self.random_move = random_move_ratio
         self.area = None
         self.is_arrive = False
+        self.not_moved = [False] * 10
+        self.history = defaultdict(int)
+        # self.history = np.full((30, 2), (-1, -1), dtype=int)
+        # self.history = []
+        self.i = 0
 
     @property
     def y(self):
@@ -88,6 +93,7 @@ class Agent:
         return directions
 
     def move(self, directions):
+        self.i += 1
         if len(directions):
             if not self.area.any() and random() < self.random_move:
                 r, c = direction[np.random.choice(directions)]
@@ -112,6 +118,22 @@ class Agent:
             self.direction = direction_dict[(r, c)]
             self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
             self.visited.add(tuple(self.location[0]))
+            self.not_moved[self.i % 10] = False
+        else:
+            self.not_moved[self.i % 10] = True
+        # self.history.append(self.location[0])
+        # self.history[self.i % 30] = self.location[0]
+        self.history[tuple(self.location[0])] += 1
+        return self.location
+
+    def stuck_check(self):
+        self.history[tuple(self.location[0])]
+        return self.history[tuple(self.location[0])] > 200
+        # x, c = np.unique(self.history, return_counts=True, axis=1)
+        # if max(c) > 10:
+        #     print(f'X: {x}')
+        #     print(f'C: {c}')
+        # return max(c) > 10
 
 
 class Adult(Agent):
@@ -133,15 +155,16 @@ class Adult(Agent):
             elif not self.area[self.sight, self.sight - 1]:
                 _loc.append([self.location[0][0], self.location[0][1] - 1])
         self.location = _loc
+        return self.location
 
 
 class AgentPool:
-    def __init__(self, generate_frequency, goal, adult_kids_ratio, random_move_ratio):
+    def __init__(self, goal, adult_kids_ratio, random_move_ratio):
         self._id = 1
         self.pool = OrderedDict()
         self.arrived = []
         self.goal = goal
-        self.generate_frequency = generate_frequency
+        # self.generate_frequency = generate_frequency
         self.adult_kids_ratio = adult_kids_ratio
         self.random_move_ratio = random_move_ratio
 
@@ -152,25 +175,28 @@ class AgentPool:
         return self._id
 
     def generate(self, point):
-        if random() < self.generate_frequency:
-            goal = [self.goal[np.argmin(cdist([point], self.goal))]]
-            if random() < self.adult_kids_ratio:
-                self.pool[self._id] = Adult(
-                    _id=self._id,
-                    loc=point,
-                    goal=goal,
-                    _direction=randint(0, 3),
-                    random_move_ratio=self.random_move_ratio,
-                )
-            else:
-                self.pool[self._id] = Agent(
-                    _id=self._id,
-                    loc=point,
-                    goal=goal,
-                    _direction=randint(0, 3),
-                    random_move_ratio=self.random_move_ratio,
-                )
-            self._id += 1
+        # print(f'point : {point}')
+        # print(f'self.goal : {self.goal}')
+        # print(f'cdist([point], self.goal) : {cdist([point], self.goal)}')
+        # if random() < self.generate_frequency:
+        goal = [self.goal[np.argmin(cdist([point], self.goal))]]
+        if random() < self.adult_kids_ratio:
+            self.pool[self._id] = Adult(
+                _id=self._id,
+                loc=point,
+                goal=goal,
+                _direction=randint(0, 3),
+                random_move_ratio=self.random_move_ratio,
+            )
+        else:
+            self.pool[self._id] = Agent(
+                _id=self._id,
+                loc=point,
+                goal=goal,
+                _direction=randint(0, 3),
+                random_move_ratio=self.random_move_ratio,
+            )
+        self._id += 1
 
     def check_arrived(self, arrived):
         for _id in arrived:
