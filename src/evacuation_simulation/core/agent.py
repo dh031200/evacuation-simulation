@@ -43,8 +43,6 @@ class Agent:
         self.is_arrive = False
         self.not_moved = [False] * 30
         self.history = defaultdict(int)
-        # self.history = np.full((30, 2), (-1, -1), dtype=int)
-        # self.history = []
         self.i = 0
 
     @property
@@ -121,19 +119,11 @@ class Agent:
             self.not_moved[self.i % 30] = False
         else:
             self.not_moved[self.i % 30] = True
-        # self.history.append(self.location[0])
-        # self.history[self.i % 30] = self.location[0]
         self.history[tuple(self.location[0])] += 1
         return self.location
 
     def stuck_check(self, area):
-        # self.history[tuple(self.location[0])]
         return (self.history[tuple(self.location[0])] > 100) and (len(np.where(area == -3)[0]) > 2)
-        # x, c = np.unique(self.history, return_counts=True, axis=1)
-        # if max(c) > 10:
-        #     print(f'X: {x}')
-        #     print(f'C: {c}')
-        # return max(c) > 10
 
 
 class Adult(Agent):
@@ -164,7 +154,6 @@ class AgentPool:
         self.pool = OrderedDict()
         self.arrived = []
         self.goal = goal
-        # self.generate_frequency = generate_frequency
         self.adult_kids_ratio = adult_kids_ratio
         self.random_move_ratio = random_move_ratio
 
@@ -175,10 +164,6 @@ class AgentPool:
         return self._id
 
     def generate(self, point):
-        # print(f'point : {point}')
-        # print(f'self.goal : {self.goal}')
-        # print(f'cdist([point], self.goal) : {cdist([point], self.goal)}')
-        # if random() < self.generate_frequency:
         goal = [self.goal[np.argmin(cdist([point], self.goal))]]
         if random() < self.adult_kids_ratio:
             self.pool[self._id] = Adult(

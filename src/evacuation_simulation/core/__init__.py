@@ -91,8 +91,6 @@ def plot(name, num_activate_agents, num_total_agents, occupancy_rate, verbose):
     ax2.set_ylim([-5, 100])
     lns = ln1 + ln2
     labs = ['Number of Activate Agents', 'Occupancy Rate (%)']
-    # labs = ['Number of Activate Agents', 'Number of Total Agents', 'Occupancy Rate (%)']
-    # ax1.legend(lns, labs, loc=0)
     ax1.legend(lns, labs, loc='lower left', bbox_to_anchor=(0.0, 0.0))
 
     plt.title(f'Simulation   [Total Agent : {num_total_agents[-1]}]')

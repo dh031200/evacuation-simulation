@@ -63,7 +63,6 @@ def evacuation_simulation(map_dir, floor, scenario):
             for b_loc, a_loc in zip(before, agent.location):
                 environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0], b_loc[1]]
                 environment.info['map'][a_loc[0], a_loc[1]] = _id
-                # environment.frequency_map[a_loc[0], a_loc[1]] += 1
 
         agent_pool.check_arrived(arrived)
         total_agent = agent_pool.get_id() - 1

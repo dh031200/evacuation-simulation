@@ -54,7 +54,6 @@ class Environment:
         self.n_entrance = len(self.info['entrance'])
 
     def get_spawn_point(self):
-        # candidate = [i for i in self.info['entrance'] if random() < self.generate_frequency]
         spawn_points = []
         ret = True
         for i in self.info['entrance']:
@@ -66,23 +65,7 @@ class Environment:
                 spawn_points.append(choice(spawn_point))
         if spawn_points:
             ret = False
-            # if spawn_point and random() < self.generate_frequency:
-            #     spawn_points.append(choice(spawn_point))
         return ret, [i for i in spawn_points if random() < self.generate_frequency]
-
-        # candidate = [i for i in self.info['entrance'] if random() < self.generate_frequency]
-        # spawn_points = []
-        # for i in candidate:
-        #     spawn_point = []
-        #     for d in direction:
-        #         if not self.info['map'][i[0] + d[0], i[1] + d[1]]:
-        #             spawn_point.append((i[0] + d[0], i[1] + d[1]))
-        #     if spawn_point:
-        #         spawn_points.append(choice(spawn_point))
-        # return spawn_points
-
-        # return self.info['entrance'][randint(0, self.n_entrance - 1)]
-        # return [i for i in self.info['entrance'] if random() < self.generate_frequency]
 
     @staticmethod
     def get_area(_map, loc, sight):
