@@ -25,17 +25,22 @@ direction_name = {0: 'up', 1: 'right', 2: 'down', 3: 'left'}
 
 
 class Agent:
-    def __init__(self, _id, loc: list[list[int, int]], goal, _direction=None, random_move_ratio=0.2):
+    def __init__(self, _id, loc: list[list[int, int]], goal, _direction=None, random_move_ratio=0.2, fr=None):
         """
         :param loc: Coordinates where the agent is located
         :param _direction: The direction the agent is looking
         :param random_move_ratio: not ideal movement ratio
         """
+        # self.fr = fr
         self._id = _id
         self.is_adult = False
         self.visited = set()
         self.location = [list(loc)]
-        self.goal = goal
+        # self.goal = goal
+        if fr:
+            self.goal = [fr] + goal
+        else:
+            self.goal = goal
         self.direction = _direction  # 0:N,  1:E,  2:S,  3:W
         self.sight = 2
         self.random_move = random_move_ratio
@@ -84,46 +89,105 @@ class Agent:
                 else:
                     max_y += 1
 
-            if cdist(self.location, self.goal)[0] < 2:
-                self.is_arrive = True
+            if cdist(self.location, self.goal)[0][0] < (2 + ((len(self.goal) - 1) * 4)):
+                del self.goal[0]
+                # print(f'self.goal : {self.goal}')
+                if not self.goal:
+                    self.is_arrive = True
+                    break
             elif len(np.where(area == -3)[0]) > 5:
                 self.is_arrive = True
             elif not area[min_y:max_y, min_x:max_x].any():
                 directions.append(i)
         return directions
 
-    def move(self, directions):
+    def move(self, directions, stuck):
         self.i += 1
+        # print(f'current : {self.location}')
+        # print(f'directions : {directions}')
         if len(directions):
             if not self.area.any() and random() < self.random_move:
-                r, c = direction[np.random.choice(directions)]
-            else:
-                t = [(self.y + direction[d][0], self.x + direction[d][1]) for d in directions]
-                dists = cdist(t, self.goal)
-
-                sorted_directions = sorted(directions, key=lambda x: dists[directions.index(x)])
-
-                _y, _x = self.location[0]
+                _next = [np.random.choice(directions)]
+            elif stuck:
+                # print('random_move')
                 _next = []
-                for d in sorted_directions:
+                # for i, _loc in self.location[0]:
+                _y, _x = self.location[0]
+                for d in directions:
                     r, c = direction[d]
                     if (_y + r, _x + c) not in self.visited:
                         _next.append(d)
 
-                if _next:
-                    r, c = direction[_next[0]]
-                else:
-                    r, c = direction[np.random.choice(directions)]
+                # _next = [set(), set()]
+                # for i, _loc in enumerate(self.location):
+                #     _y, _x = _loc
+                #
+                #     for d in directions:
+                #         r, c = direction[d]
+                #         if (_y + r, _x + c) not in self.visited:
+                #             _next[i].add(d)
+                # _next = _next[0].intersection(_next[1])
+
+            else:
+                # print('distance_base')
+                t = [(self.y + direction[d][0], self.x + direction[d][1]) for d in directions]
+                dists = cdist(t, self.goal)
+
+                sorted_directions = sorted(directions, key=lambda x: dists[directions.index(x)][0])
+                # print(f'sorted_directions : {sorted_directions}')
+                # print(f'self.visited: {self.visited}')
+                _next = []
+                # for i, _loc in enumerate(self.location):
+                _y, _x = self.location[0]
+                for d in sorted_directions:
+                    r, c = direction[d]
+                    if (_y + r, _x + c) not in self.visited:
+                        # print(f'OOO {(_y + r, _x + c)} not in self.visited')
+                        _next.append(d)
+                    # else:
+                    # print(f'XXX {(_y + r, _x + c)} in self.visited')
+
+                # _next = [set(), set()]
+                # for i, _loc in enumerate(self.location):
+                #     _y, _x = _loc
+                #     for d in sorted_directions:
+                #         r, c = direction[d]
+                #         if (_y + r, _x + c) not in self.visited:
+                #             print(f'OOO {(_y + r, _x + c)} not in self.visited')
+                #             _next[i].add(d)
+                #         else:
+                #             print(f'XXX {(_y + r, _x + c)} in self.visited')
+                # _next = _next[0].intersection(_next[1])
+            # print(f'_next : {_next}')
+            _next = list(_next)
+            if _next:
+                frequency = [_next[0]] * 9
+                r, c = direction[np.random.choice(frequency + _next[:2])]
+            else:
+                r, c = direction[np.random.choice(directions)]
 
             self.direction = direction_dict[(r, c)]
             self.location = [[loc[0] + r, loc[1] + c] for loc in self.location]
+            # loc = []
+            # print(f'r : {r}, c : {c}')
+            # for _loc in self.location:
+            #     __loc = (_loc[0] + r, _loc[1] + c)
+            #     loc.append(__loc)
+            #     self.visited.add(__loc)
+            # self.location = loc
             self.visited.add(tuple(self.location[0]))
+            # self.visited.add(tuple(self.location[1]))
+            # if tuple(self.location[0]) == (292, 255):
+            # print('now')
             self.not_moved[self.i % 30] = False
         else:
             self.not_moved[self.i % 30] = True
+        # else:
+        # self.not_moved[self.i % 30] = True
         # self.history.append(self.location[0])
         # self.history[self.i % 30] = self.location[0]
         self.history[tuple(self.location[0])] += 1
+        # print('-------------------------------------')
         return self.location
 
     def stuck_check(self, area):
@@ -137,12 +201,12 @@ class Agent:
 
 
 class Adult(Agent):
-    def __init__(self, _id, loc: list[list[int, int]], goal, _direction=None, random_move_ratio=0.2):
-        super().__init__(_id=_id, loc=loc, goal=goal, _direction=_direction, random_move_ratio=random_move_ratio)
+    def __init__(self, _id, loc: list[list[int, int]], goal, _direction=None, random_move_ratio=0.2, fr=None):
+        super().__init__(_id=_id, loc=loc, goal=goal, _direction=_direction, random_move_ratio=random_move_ratio, fr=fr)
         self.is_adult = True
 
-    def move(self, directions):
-        super().move(directions)
+    def move(self, directions, stuck):
+        super().move(directions, stuck)
         _loc = [self.location[0]]
         if self.direction % 2:
             if not self.area[self.sight + 1, self.sight]:
@@ -180,6 +244,18 @@ class AgentPool:
         # print(f'cdist([point], self.goal) : {cdist([point], self.goal)}')
         # if random() < self.generate_frequency:
         goal = [self.goal[np.argmin(cdist([point], self.goal))]]
+        # print(f'point : {point}')
+        fr = None
+        if (point[0] == 200) and (113 <= point[1] <= 134):
+            fr = (296, 155)
+        elif (point[0] == 200) and (139 <= point[1] <= 240):
+            fr = (224, 302)
+        elif (200 <= point[0] <= 221) and (point[1] == 240):
+            fr = (224, 302)
+        elif (283 <= point[0] <= 297) and (point[1] == 178):
+            fr = (279, 129)
+        # elif (215 <= point[0] <= 226) and (point[1] == 432):
+        #     fr = (151, 348)
         if random() < self.adult_kids_ratio:
             self.pool[self._id] = Adult(
                 _id=self._id,
@@ -187,6 +263,7 @@ class AgentPool:
                 goal=goal,
                 _direction=randint(0, 3),
                 random_move_ratio=self.random_move_ratio,
+                fr=fr,
             )
         else:
             self.pool[self._id] = Agent(
@@ -195,6 +272,7 @@ class AgentPool:
                 goal=goal,
                 _direction=randint(0, 3),
                 random_move_ratio=self.random_move_ratio,
+                fr=fr,
             )
         self._id += 1
 

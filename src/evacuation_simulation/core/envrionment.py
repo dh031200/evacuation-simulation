@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
+import cv2
 
 """
  0 이동 가능
@@ -52,6 +53,7 @@ class Environment:
 
         self.info = dict(map=_map, rally_point=rally_point, entrance=entrance)
         self.n_entrance = len(self.info['entrance'])
+        # print(entrance)
 
     def get_spawn_point(self):
         # candidate = [i for i in self.info['entrance'] if random() < self.generate_frequency]
@@ -84,8 +86,17 @@ class Environment:
         # return self.info['entrance'][randint(0, self.n_entrance - 1)]
         # return [i for i in self.info['entrance'] if random() < self.generate_frequency]
 
-    @staticmethod
-    def get_area(_map, loc, sight):
+    def get_area(self, loc, sight, goal):
+        # canvas = np.zeros_like(self.info['map'], dtype=np.uint8)
+        canvas = np.zeros(self.info['map'].shape, dtype=np.uint8)
+        _loc = (loc[0][1], loc[0][0])
+        _goal = (goal[0][1], goal[0][0])
+        # print(canvas.shape)
+        # print(loc[0])
+        # print(goal[0])
+        cv2.line(canvas, _loc, _goal, 255, 1)
+        # self.info['map'][canvas == 255]
+        # cv2.imshow('vv', canvas)
         min_y, max_y, min_x, max_x = (
             int(1e9),
             -int(1e9),
@@ -97,4 +108,13 @@ class Environment:
             max_y = max(max_y, _loc[0])
             min_x = min(min_x, _loc[1])
             max_x = max(max_x, _loc[1])
-        return _map[min_y - sight : max_y + sight + 1, min_x - sight : max_x + sight + 1]
+
+        line = canvas[min_y - sight: max_y + sight + 1, min_x - sight: max_x + sight + 1]
+        area = self.info['map'][min_y - sight: max_y + sight + 1, min_x - sight: max_x + sight + 1]
+        # if -1 in area[line == 255]:
+        #     print('stuck')
+        # cv2.imshow('vv', line)
+        # cv2.imshow('vv', area[line==255])
+
+        return -1 in area[line == 255], self.info['map'][min_y - sight: max_y + sight + 1,
+                                        min_x - sight: max_x + sight + 1]

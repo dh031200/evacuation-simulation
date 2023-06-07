@@ -114,4 +114,4 @@ def counts(_map):
     return {tuple(i): v for i, v in zip(unique, _counts)}
 
 
-__all__ = 'AgentPool', 'Environment', 'show', 'destroy', 'writer', 'plot', 'to_csv', 'heatmap', 'prefix'
+__all__ = 'AgentPool', 'Environment', 'show', 'destroy', 'writer', 'plot', 'to_csv', 'heatmap', 'prefix', 'wait'

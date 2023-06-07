@@ -4,7 +4,7 @@
 import click
 
 from evacuation_simulation.__about__ import __version__
-from evacuation_simulation import AgentPool, Environment, show, destroy, writer, plot, to_csv, heatmap, mkdir
+from evacuation_simulation import AgentPool, Environment, show, destroy, writer, plot, to_csv, heatmap, mkdir, wait
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
@@ -15,7 +15,8 @@ from evacuation_simulation import AgentPool, Environment, show, destroy, writer,
 def evacuation_simulation(map_dir, floor, scenario):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario, generate_frequency=0.01)
-    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.2)
+    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.05)
+    # agent_pool.generate([204,122])
     _map = environment.info['map'].copy()
     simulation_name = f'{floor}F_S_{scenario}'
     prefix = f'{simulation_name}/'
@@ -30,58 +31,61 @@ def evacuation_simulation(map_dir, floor, scenario):
 
     mem = [False] * 10
     i = 0
-    while True:
-        i += 1
-        ret, spawn_points = environment.get_spawn_point()
-        mem[i % 10] = ret
-        if sum(mem) == 10:
-            break
-        for spawn_point in spawn_points:
-            agent_pool.generate(spawn_point)
+    try:
+        while True:
+            i += 1
+            ret, spawn_points = environment.get_spawn_point()
+            mem[i % 10] = ret
+            if sum(mem) == 10:
+                break
+            for spawn_point in spawn_points:
+                agent_pool.generate(spawn_point)
 
-        arrived = []
-        for _id in agent_pool.pool:
-            agent = agent_pool.pool[_id]
-            area = environment.get_area(environment.info['map'], agent.location, agent.sight)
-            _next = agent.check(area)
-            if agent.is_arrive:
-                for _loc in agent.location:
-                    environment.info['map'][_loc[0], _loc[1]] = -3
+            arrived = []
+            for _id in agent_pool.pool:
+                agent = agent_pool.pool[_id]
+                # print(agent.fr)
+                _stuck, area = environment.get_area(agent.location, agent.sight, agent.goal)
+                _next = agent.check(area)
+                if agent.is_arrive:
+                    for _loc in agent.location:
+                        environment.info['map'][_loc[0], _loc[1]] = -3
 
-                arrived.append(agent.id)
-                continue
-            before = agent.location
-            # agent.move(_next)
-            coords = agent.move(_next)
-            if sum(agent.not_moved) == 30 or agent.stuck_check(area):
-                for _loc in agent.location:
-                    environment.info['map'][_loc[0], _loc[1]] = -3
-                arrived.append(agent.id)
-                continue
-            for coord in coords:
-                environment.frequency_map[coord[0], coord[1]] += 1
-            for b_loc, a_loc in zip(before, agent.location):
-                environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0], b_loc[1]]
-                environment.info['map'][a_loc[0], a_loc[1]] = _id
-                # environment.frequency_map[a_loc[0], a_loc[1]] += 1
+                    arrived.append(agent.id)
+                    continue
+                before = agent.location
+                # agent.move(_next)
+                coords = agent.move(_next, _stuck)
+                if agent.stuck_check(area):
+                # if sum(agent.not_moved) == 30 or agent.stuck_check(area):
+                    for _loc in agent.location:
+                        environment.info['map'][_loc[0], _loc[1]] = -3
+                    arrived.append(agent.id)
+                    continue
+                for coord in coords:
+                    environment.frequency_map[coord[0], coord[1]] += 1
+                for b_loc, a_loc in zip(before, agent.location):
+                    environment.info['map'][b_loc[0], b_loc[1]] = _map[b_loc[0], b_loc[1]]
+                    environment.info['map'][a_loc[0], a_loc[1]] = _id
 
-        agent_pool.check_arrived(arrived)
-        total_agent = agent_pool.get_id() - 1
+            agent_pool.check_arrived(arrived)
+            total_agent = agent_pool.get_id() - 1
 
-        show(
-            f'Simulation of {simulation_name}', environment.info['map'], agent_pool.pool, total_agent, simulation_writer
-        )
-        heatmap_writer.write(heatmap(environment.frequency_map))
+            show(
+                f'Simulation of {simulation_name}', environment.info['map'], agent_pool.pool, total_agent, simulation_writer
+            )
+            heatmap_writer.write(heatmap(environment.frequency_map))
 
-        if not i % 150:
-            num_activate_agents.append(len(agent_pool))
-            num_total_agents.append(agent_pool.get_id() - 1)
-            occupancy_rate.append(round(environment.calc_occupancy() / environment.movable * 100, 4))
-            verbose.append(i)
+            if not i % 150:
+                num_activate_agents.append(len(agent_pool))
+                num_total_agents.append(agent_pool.get_id() - 1)
+                occupancy_rate.append(round(environment.calc_occupancy() / environment.movable * 100, 4))
+                verbose.append(i)
 
-            plot(prefix + simulation_name, num_activate_agents, num_total_agents, occupancy_rate, verbose)
-            to_csv(prefix + simulation_name, num_activate_agents, num_total_agents, occupancy_rate, verbose)
-
-    destroy()
-    simulation_writer.release()
-    heatmap_writer.release()
+                plot(prefix + simulation_name, num_activate_agents, num_total_agents, occupancy_rate, verbose)
+                to_csv(prefix + simulation_name, num_activate_agents, num_total_agents, occupancy_rate, verbose)
+            # wait()
+    except:
+        destroy()
+        simulation_writer.release()
+        heatmap_writer.release()
