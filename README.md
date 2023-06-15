@@ -13,7 +13,37 @@
 ## Installation
 
 ```console
-pip install evacuation-simulation
+pip install git+https://github.com/dh031200/evacuation-simulation
+```
+
+## Map directory tree
+```
+Workspace
+└ map
+　 ├ 2f_grid_S_1.csv
+　 ├ 2f_grid_S_2.csv
+　 ├ 3f_grid_S_1.csv
+　 └ 3f_grid_S_2.csv
+```
+  
+
+## Usage
+
+#### Arguments
+* '--map_dir', '-m' : map directory
+* '--floor', '-f' : floor for simulation
+* '--scenario', '-s' : scenario for simulation
+
+#### Command example
+```bash
+# 2층 1번 시나리오
+evacuation-simulation -m map -f 2 -s 1
+
+# 2층 2번 시나리오
+evacuation-simulation -m map -f 2 -s 2
+
+# 3층 1번 시나리오
+evacuation-simulation -m map -f 3 -s 1
 ```
 
 ## License
