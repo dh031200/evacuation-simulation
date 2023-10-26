@@ -33,7 +33,7 @@ Workspace
 * `--map_dir`, `-m` : map directory
 * `--floor`, `-f` : floor for simulation
 * `--scenario`, `-s` : scenario for simulation
-* `--generate_frequency`, `-gf` : agent generate frequency (optional, default: 0.01)  
+* `--generate_frequency`, `-gf` : agent generate frequency (optional, default: 0.01)
   * `<<0-Less-------More-1>>`
 * `--adult_kids_ratio`, `-akr` : agent adult-kids ratio (optional, default: 0.7)
   * `<<0-Kid-------Adult-1>>`
