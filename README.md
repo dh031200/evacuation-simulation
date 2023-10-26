@@ -30,20 +30,32 @@ Workspace
 ## Usage
 
 #### Arguments
-* '--map_dir', '-m' : map directory
-* '--floor', '-f' : floor for simulation
-* '--scenario', '-s' : scenario for simulation
+* `--map_dir`, `-m` : map directory
+* `--floor`, `-f` : floor for simulation
+* `--scenario`, `-s` : scenario for simulation
+* `--generate_frequency`, `-gf` : agent generate frequency (optional, default: 0.01) `<<0-Less-------More-1>>`
+* `--adult_kids_ratio`, `-akr` : agent adult-kids ratio (optional, default: 0.7) `<<0-Kid-------Adult-1>>`
+* `--random_move_ratio`, `-rmr` : agent random move ratio (optional, default: 0.2) `<<0-Non-random-------Random-1>>`
+* `--remove_arrived_agents`, `-rma` : remove arrived agents (optional, default: True)
 
 #### Command example
 ```bash
-# 2층 1번 시나리오
-evacuation-simulation -m map -f 2 -s 1
-
-# 2층 2번 시나리오
+# 2층 1번 시나리오 [frequency: 0.01, 아이3:7어른, 도착한 에이전트 제거]
 evacuation-simulation -m map -f 2 -s 2
 
-# 3층 1번 시나리오
+# 2층 1번 시나리오 agent [frequency: 0.001, adult_kids_ratio:0.0(아이만), 도착한 에이전트 제거 하지 않음]
+evacuation-simulation -m map -f 2 -s 2 -gf 0.001 -akr 0.0 -rmr False
+
+# 2층 1번 시나리오 agent [frequency: 0.01, adult_kids_ratio:0.9(아이1:9어른), 도착한 에이전트 제거]
+evacuation-simulation -m map -f 2 -s 2 -gf 0.01 -akr 0.9
+
+# 3층 1번 시나리오 [frequency: 0.01, 아이3:7어른, 도착한 에이전트 제거]
 evacuation-simulation -m map -f 3 -s 1
+
+# 3층 2번 시나리오 [frequency: 0.01, 아이3:7어른, 도착한 에이전트 제거]
+evacuation-simulation -m map -f 3 -s 2
+
+
 ```
 
 ## License
