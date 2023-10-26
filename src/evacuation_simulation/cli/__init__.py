@@ -16,12 +16,14 @@ from evacuation_simulation import AgentPool, Environment, show, destroy, writer,
 @click.option('--adult_kids_ratio', '-akr', type=click.FLOAT, default=0.7, help='agent adult-kids ratio')
 @click.option('--random_move_ratio', '-rmr', type=click.FLOAT, default=0.2, help='agent random move ratio')
 @click.option('--remove_arrived_agents', '-rma', type=click.BOOL, default=True, help='remove arrived agents')
-def evacuation_simulation(map_dir, floor, scenario, generate_frequency, adult_kids_ratio, random_move_ratio,
-                          remove_arrived_agents):
+def evacuation_simulation(
+    map_dir, floor, scenario, generate_frequency, adult_kids_ratio, random_move_ratio, remove_arrived_agents
+):
     click.echo("Hello world!")
     environment = Environment(map_dir, floor, scenario, generate_frequency=generate_frequency)
-    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=adult_kids_ratio,
-                           random_move_ratio=random_move_ratio)
+    agent_pool = AgentPool(
+        goal=environment.info['rally_point'], adult_kids_ratio=adult_kids_ratio, random_move_ratio=random_move_ratio
+    )
     _map = environment.info['map'].copy()
     simulation_name = f'{floor}F_S_{scenario}'
     prefix = f'{simulation_name}/'
