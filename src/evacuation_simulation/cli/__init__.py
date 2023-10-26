@@ -12,10 +12,16 @@ from evacuation_simulation import AgentPool, Environment, show, destroy, writer,
 @click.option('--map_dir', '-m', required=True, help='map directory')
 @click.option('--floor', '-f', required=True, help='floor for simulation')
 @click.option('--scenario', '-s', required=True, help='scenario for simulation')
-def evacuation_simulation(map_dir, floor, scenario):
+@click.option('--generate_frequency', '-gf', type=click.FLOAT, default=0.01, help='agent generate frequency')
+@click.option('--adult_kids_ratio', '-akr', type=click.FLOAT, default=0.7, help='agent adult-kids ratio')
+@click.option('--random_move_ratio', '-rmr', type=click.FLOAT, default=0.2, help='agent random move ratio')
+@click.option('--remove_arrived_agents', '-rma', type=click.BOOL, default=True, help='remove arrived agents')
+def evacuation_simulation(map_dir, floor, scenario, generate_frequency, adult_kids_ratio, random_move_ratio,
+                          remove_arrived_agents):
     click.echo("Hello world!")
-    environment = Environment(map_dir, floor, scenario, generate_frequency=0.01)
-    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=0.7, random_move_ratio=0.2)
+    environment = Environment(map_dir, floor, scenario, generate_frequency=generate_frequency)
+    agent_pool = AgentPool(goal=environment.info['rally_point'], adult_kids_ratio=adult_kids_ratio,
+                           random_move_ratio=random_move_ratio)
     _map = environment.info['map'].copy()
     simulation_name = f'{floor}F_S_{scenario}'
     prefix = f'{simulation_name}/'
@@ -27,6 +33,8 @@ def evacuation_simulation(map_dir, floor, scenario):
     num_activate_agents = []
     num_total_agents = []
     show(f'Simulation of {simulation_name}', environment.info['map'], agent_pool.pool, 0, simulation_writer)
+
+    _arrived = 0 if remove_arrived_agents else -3
 
     mem = [False] * 10
     i = 0
@@ -46,7 +54,7 @@ def evacuation_simulation(map_dir, floor, scenario):
             _next = agent.check(area)
             if agent.is_arrive:
                 for _loc in agent.location:
-                    environment.info['map'][_loc[0], _loc[1]] = -3
+                    environment.info['map'][_loc[0], _loc[1]] = _arrived
 
                 arrived.append(agent.id)
                 continue
@@ -55,7 +63,7 @@ def evacuation_simulation(map_dir, floor, scenario):
             coords = agent.move(_next)
             if sum(agent.not_moved) == 30 or agent.stuck_check(area):
                 for _loc in agent.location:
-                    environment.info['map'][_loc[0], _loc[1]] = -3
+                    environment.info['map'][_loc[0], _loc[1]] = _arrived
                 arrived.append(agent.id)
                 continue
             for coord in coords:
