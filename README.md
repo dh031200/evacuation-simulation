@@ -5,6 +5,7 @@
 
 -----
 
+
 **Table of Contents**
 
 - [Installation](#installation)
@@ -58,12 +59,22 @@ evacuation-simulation -m map -f 3 -s 1
 # 3층 2번 시나리오 [frequency: 0.01, 아이3:7어른, 도착한 에이전트 제거]
 evacuation-simulation -m map -f 3 -s 2
 
-
 ```
+
+## Result
+### 2F 시나리오 2
+|병목현상 히트맵|시뮬레이션|
+|---|---|
+|![image](https://github.com/dh031200/evacuation-simulation/assets/66017052/78717e91-a2c9-4880-9279-b6546396512a)|![image](https://github.com/dh031200/evacuation-simulation/assets/66017052/1bac3bc6-e5b3-45f4-bfe4-402c65fff941)|
+
+|결과값|그래프|
+|---|---|
+|![2F_S_2_data](https://github.com/dh031200/evacuation-simulation/assets/66017052/2326b4f0-2ae3-48fd-be11-9667519f9808)|![2F_S_2_plot](https://github.com/dh031200/evacuation-simulation/assets/66017052/451514b0-20cb-4d08-abd2-0f7ed2af3818)|
 
 ## License
 
 `evacuation-simulation` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
 
 ## todo
 
